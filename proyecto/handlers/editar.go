@@ -7,6 +7,7 @@ import (
 
 	"gestion-libros/database"
 	"gestion-libros/models"
+	"gestion-libros/utils"
 )
 
 // MostrarEditarHandler responde a peticiones GET.
@@ -64,6 +65,12 @@ func ActualizarHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update
 	models.ActualizarLibro(db, libroEditado)
+	models.ActualizarLibro(db, libroEditado)
+
+	// Lanzamos la concurrencia (Goroutine)
+	go utils.RegistrarAccion("ACTUALIZAR", "Se modificó el libro con ID: "+strconv.Itoa(id))
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 
 	// Redirección limpia a la tabla principal
 	http.Redirect(w, r, "/", http.StatusSeeOther)

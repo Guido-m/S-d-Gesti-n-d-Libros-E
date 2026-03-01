@@ -8,6 +8,7 @@ import (
 
 	"gestion-libros/database"
 	"gestion-libros/models"
+	"gestion-libros/utils"
 )
 
 // CrearHandler responde a peticiones GET renderizando la vista del formulario HTML.
@@ -51,7 +52,7 @@ func GuardarHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Conexión a la base de datos
 	db, _ := database.Conectar()
-	defer db.Close() 
+	defer db.Close()
 
 	// Ejecución de la operación Create (C del CRUD)
 	err := models.InsertarLibro(db, nuevoLibro)
@@ -60,7 +61,11 @@ func GuardarHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error crítico al guardar el registro", http.StatusInternalServerError)
 		return
 	}
+	// Lanzamos la concurrencia (Goroutine)
+	go utils.RegistrarAccion("CREAR", "Se registró un nuevo libro: "+titulo)
 
+	// 5. Redirigir al usuario...
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 	// 6. Patrón PRG (Post/Redirect/Get): Redirige al inicio para evitar reenvíos duplicados
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

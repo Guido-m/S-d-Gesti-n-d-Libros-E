@@ -7,6 +7,7 @@ import (
 
 	"gestion-libros/database"
 	"gestion-libros/models"
+	"gestion-libros/utils"
 )
 
 // EliminarHandler procesa la petición de borrado de un registro específico.
@@ -31,9 +32,19 @@ func EliminarHandler(w http.ResponseWriter, r *http.Request) {
 	db, _ := database.Conectar()
 	defer db.Close() // Garantiza que los recursos se liberen al terminar
 
-
 	// Delegamos la lógica SQL a la capa de Modelo para mantener el controlador limpio
 	err = models.EliminarLibro(db, id)
+
+	err = models.EliminarLibro(db, id)
+	if err != nil {
+		log.Println("Error de ejecución o integridad al intentar eliminar libro:", err)
+	}
+
+	// Lanzamos la concurrencia (Goroutine)
+	go utils.RegistrarAccion("ELIMINAR", "Se borró el libro con ID: "+strconv.Itoa(id))
+
+	// 6. Redirección final...
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 	if err != nil {
 		//Manejo de errores del servidor
 		log.Println("Error de ejecución o integridad al intentar eliminar libro:", err)
