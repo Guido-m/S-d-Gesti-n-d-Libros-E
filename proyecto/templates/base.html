@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Inventario de Libros</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            /* Variables CSS para mantener los colores consistentes */
+            :root {
+                --primary: #4f46e5;
+                --primary-hover: #4338ca;
+                --success: #10b981;
+                --success-hover: #059669;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --bg-color: #f3f4f6;
+                --text-main: #1f2937;
+                --text-muted: #6b7280;
+            }
+
+            /* Reseteo básico y tipografía */
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: "Inter", sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-main);
+                padding: 40px 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* Contenedor principal estilo tarjeta */
+            .container {
+                width: 100%;
+                max-width: 1000px;
+                background: white;
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+
+            /* Encabezado */
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #111827;
+            }
+
+            /* Estilos de la tabla */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            th,
+            td {
+                padding: 14px 16px;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            th {
+                background-color: #f9fafb;
+                color: var(--text-muted);
+                font-weight: 600;
+                font-size: 0.875rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            tr:hover {
+                background-color: #f9fafb;
+            }
+
+            /* Botones y Enlaces con UX (Hover y transiciones) */
+            .btn {
+                display: inline-block;
+                padding: 8px 16px;
+                font-size: 0.875rem;
+                font-weight: 500;
+                text-decoration: none;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+                cursor: pointer;
+                border: none;
+            }
+
+            .btn-crear {
+                background-color: var(--primary);
+                color: white;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .btn-crear:hover {
+                background-color: var(--primary-hover);
+                transform: translateY(-1px);
+            }
+
+            .btn-editar {
+                color: var(--warning);
+                background: #fef3c7;
+                padding: 6px 12px;
+            }
+            .btn-editar:hover {
+                background: #fde68a;
+            }
+
+            .btn-eliminar {
+                color: var(--danger);
+                background: #fee2e2;
+                padding: 6px 12px;
+                margin-left: 8px;
+            }
+            .btn-eliminar:hover {
+                background: #fecaca;
+            }
+
+            /* Estado vacío */
+            .empty-state {
+                text-align: center;
+                padding: 40px;
+                color: var(--text-muted);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>📚 Inventario de Libros</h1>
+                <a href="/crear" class="btn btn-crear">
+                    <svg
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        ></path>
+                    </svg>
+                    Nuevo Libro
+                </a>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Género</th>
+                        <th>Año</th>
+                        <th>Formato</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{if .}} {{range .}}
+                    <tr>
+                        <td style="font-weight: 600; color: var(--text-muted)">
+                            #{{.ID}}
+                        </td>
+                        <td style="font-weight: 500">{{.Titulo}}</td>
+                        <td>{{.Autor}}</td>
+                        <td>
+                            <span
+                                style="
+                                    background: #e0e7ff;
+                                    color: #3730a3;
+                                    padding: 4px 8px;
+                                    border-radius: 9999px;
+                                    font-size: 0.75rem;
+                                    font-weight: 500;
+                                "
+                            >
+                                {{.Genero}}
+                            </span>
+                        </td>
+                        <td>{{.Anio}}</td>
+                        <td>{{.Formato}}</td>
+                        <td>
+                            <a href="/editar?id={{.ID}}" class="btn btn-editar"
+                                >Editar</a
+                            >
+                            <a
+                                href="/eliminar?id={{.ID}}"
+                                class="btn btn-eliminar"
+                                onclick="return confirm('¿Estás seguro de que deseas eliminar este libro?');"
+                                >Eliminar</a
+                            >
+                        </td>
+                    </tr>
+                    {{end}} {{else}}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <span style="font-size: 2rem">📭</span>
+                                <p style="margin-top: 10px">
+                                    Aún no hay libros en el inventario.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
