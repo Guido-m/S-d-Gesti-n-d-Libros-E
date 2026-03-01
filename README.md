@@ -47,6 +47,7 @@ git clone [https://github.com/Guido-m/S-d-Gesti-n-d-Libros-E.git](https://github
 cd S-d-Gesti-n-d-Libros-E
 ```
 -- 1. Crear la base de datos
+```bash
 CREATE DATABASE IF NOT EXISTS gestion_libros;
 USE gestion_libros;
 
@@ -59,3 +60,4 @@ CREATE TABLE IF NOT EXISTS libros (
     anio INT,
     formato VARCHAR(50)
 );
+```
