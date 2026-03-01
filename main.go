@@ -116,32 +116,146 @@ func (s *SistemaGestion) RegistrarLibro() error {
 	return nil
 }
 
-// ConsultarLibros muestra el listado actual de libros registrados.
-// (Actualmente en fase de construcción básica para verificar funcionalidad).
+// ConsultarLibros muestra el listado actual o permite buscar por coincidencias.
+// Implementa un sub-menú para manejar diferentes tipos de consulta.
 func (s *SistemaGestion) ConsultarLibros() {
-	fmt.Println("\n--- Módulo de Consulta ---")
 	if len(s.inventario) == 0 {
-		fmt.Println("No hay libros registrados en el sistema.")
+		fmt.Println("\nNo hay libros registrados en el sistema.")
 		return
 	}
 
-	fmt.Println("Listado de Libros:")
-	for _, libro := range s.inventario {
-		fmt.Println(libro.ObtenerDetalles())
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("\n--- Módulo de Consulta ---")
+	fmt.Println("1. Listar todos los libros")
+	fmt.Println("2. Buscar por título o autor")
+	fmt.Print("Seleccione una opción: ")
+
+	// 1. Captura de la opción de consulta
+	opcion, _ := reader.ReadString('\n')
+	opcion = strings.TrimSpace(opcion)
+
+	// 2. Control de flujo según el tipo de consulta
+	if opcion == "1" {
+		fmt.Println("\nListado completo de Libros:")
+		for _, libro := range s.inventario {
+			fmt.Println(libro.ObtenerDetalles())
+		}
+	} else if opcion == "2" {
+		fmt.Print("Ingrese el término de búsqueda (título o autor): ")
+		termino, _ := reader.ReadString('\n')
+		termino = strings.ToLower(strings.TrimSpace(termino)) // Normalizamos a minúsculas para mejorar la búsqueda
+
+		encontrados := 0
+		fmt.Println("\nResultados de la búsqueda:")
+
+		// 3. Recorrido del slice filtrando por coincidencias
+		for _, libro := range s.inventario {
+			tituloLower := strings.ToLower(libro.titulo)
+			autorLower := strings.ToLower(libro.autor)
+
+			if strings.Contains(tituloLower, termino) || strings.Contains(autorLower, termino) {
+				fmt.Println(libro.ObtenerDetalles())
+				encontrados++
+			}
+		}
+
+		// 4. Validación si no hubo resultados
+		if encontrados == 0 {
+			fmt.Println("No se encontraron coincidencias.")
+		}
+	} else {
+		fmt.Println("Opción de consulta inválida.")
 	}
 }
 
-// ActualizarLibro permite modificar la información de un libro existente.
-// (Estructura definida, lógica pendiente de implementación detallada).
+// ActualizarLibro permite modificar la información de un libro existente mediante su ID.
+// Valida la existencia del registro y actualiza solo los campos proporcionados.
 func (s *SistemaGestion) ActualizarLibro() error {
-	fmt.Println("\n--- Módulo de Actualización (En construcción) ---")
+	if len(s.inventario) == 0 {
+		return errors.New("el inventario está vacío, no hay nada que actualizar")
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("\n--- Módulo de Actualización ---")
+
+	// 1. Captura y validación del ID
+	fmt.Print("Ingrese el ID del libro a modificar: ")
+	idStr, _ := reader.ReadString('\n')
+	idBuscado, err := strconv.Atoi(strings.TrimSpace(idStr))
+	if err != nil {
+		return errors.New("el ID debe ser un valor numérico")
+	}
+
+	// 2. Búsqueda del libro en el Slice de memoria
+	var libroEncontrado *Libro
+	for _, libro := range s.inventario {
+		if libro.id == idBuscado {
+			libroEncontrado = libro
+			break
+		}
+	}
+
+	// 3. Validación de existencia
+	if libroEncontrado == nil {
+		return errors.New("no se encontró ningún libro con ese ID")
+	}
+
+	// 4. Modificación de campos (Permite dejar en blanco para mantener el actual)
+	fmt.Println("Deje el campo en blanco y presione Enter si no desea modificarlo.")
+
+	fmt.Printf("Nuevo Título (Actual: %s): ", libroEncontrado.titulo)
+	nuevoTitulo, _ := reader.ReadString('\n')
+	nuevoTitulo = strings.TrimSpace(nuevoTitulo)
+	if nuevoTitulo != "" {
+		libroEncontrado.titulo = nuevoTitulo
+	}
+
+	fmt.Printf("Nuevo Autor (Actual: %s): ", libroEncontrado.autor)
+	nuevoAutor, _ := reader.ReadString('\n')
+	nuevoAutor = strings.TrimSpace(nuevoAutor)
+	if nuevoAutor != "" {
+		libroEncontrado.autor = nuevoAutor
+	}
+
+	fmt.Println(">> Libro actualizado correctamente.")
 	return nil
 }
 
 // EliminarLibro permite borrar un libro del sistema mediante su ID.
-// (Estructura definida, lógica pendiente de implementación detallada).
+// Utiliza la manipulación de Slices nativa de Go para remover el registro.
 func (s *SistemaGestion) EliminarLibro() error {
-	fmt.Println("\n--- Módulo de Eliminación (En construcción) ---")
+	if len(s.inventario) == 0 {
+		return errors.New("el inventario está vacío, no hay nada que eliminar")
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("\n--- Módulo de Eliminación ---")
+
+	// 1. Captura y validación del ID a eliminar
+	fmt.Print("Ingrese el ID del libro a eliminar: ")
+	idStr, _ := reader.ReadString('\n')
+	idBuscado, err := strconv.Atoi(strings.TrimSpace(idStr))
+	if err != nil {
+		return errors.New("el ID debe ser un valor numérico")
+	}
+
+	// 2. Búsqueda del índice exacto del libro en el Slice
+	indiceAEliminar := -1
+	for i, libro := range s.inventario {
+		if libro.id == idBuscado {
+			indiceAEliminar = i
+			break
+		}
+	}
+
+	// 3. Validación de existencia
+	if indiceAEliminar == -1 {
+		return errors.New("no se encontró ningún libro con ese ID")
+	}
+
+	// 4. Reestructuración del Slice excluyendo el elemento encontrado
+	s.inventario = append(s.inventario[:indiceAEliminar], s.inventario[indiceAEliminar+1:]...)
+	fmt.Println(">> Libro eliminado del sistema exitosamente.")
 	return nil
 }
 
