@@ -51,8 +51,10 @@ cd S-d-Gesti-n-d-Libros-E
 ```bash
 CREATE DATABASE IF NOT EXISTS gestion_libros;
 USE gestion_libros;
+```
 
 -- 2. Crear la tabla principal
+```bash
 CREATE TABLE IF NOT EXISTS libros (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
