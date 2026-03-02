@@ -36,6 +36,7 @@ El código demuestra el dominio de conceptos avanzados de desarrollo backend en 
 ├── templates/     # Archivos HTML con sintaxis de Go Templates para la interfaz visual
 ├── utils/         # Funciones auxiliares y sistema de auditoría concurrente
 └── main.go        # Entry point: Inicializa la BD, define el enrutador y arranca el servidor
+```
 ## 💻 Instalación y Ejecución
 
 Para correr este proyecto localmente, necesitas tener instalado **Go (Golang)** y un servidor **MySQL** (puedes usar herramientas como XAMPP, WAMP, o Docker).
